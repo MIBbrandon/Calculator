@@ -65,10 +65,16 @@ def checkOperators(expList):
 def checkDecimalPoint(expList):
 	expression = expList[0]
 	index = 0
+	DecimalAllowedAgain = True #Makes sure that only one decimal per number is allowed. More details further down
 	if(expression[0]=="." or expression[-1]=="."): return False
-	for char in expression: #If there
-		if((expression[index]==".") and (index != 0) and (index != len(expression)-1) and (not(expression[index-1] in "0123456789" and expression[index+1] in "0123456789"))):
-			return False
+	for char in expression: #Checking conditions that decimal points should comply with
+		if(expression[index] in "*/+-()"): #If we come across an operator or parenthesis, a new number emerges, allowing it to have a decimal
+			DecimalAllowedAgain = True #We will come across a new number, so a new decimal may exist
+		elif(DecimalAllowedAgain and expression[index]=="."):
+			DecimalAllowedAgain = False #This blocks any new decimal until we come across an operator or parenthesis
+			if((index != len(expression)-1) and (not(expression[index-1] in "0123456789" and expression[index+1] in "0123456789"))):
+				return False
+		index +=1
 	return True
 
 #CALCULATIONS
