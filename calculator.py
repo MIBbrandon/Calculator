@@ -4,6 +4,7 @@ win = tk.Tk()
 
 win.title("Calculator")
 win.geometry("250x300")
+win.iconbitmap('./calculatorIcon.ico')
 
 def checkParenthesis(expList):
 	expression = expList[0]
@@ -19,9 +20,9 @@ def checkParenthesis(expList):
 		if(index != 0 and expression[index-1]==")" and expression[index]=="("): #Inserts multiplication when ")(" is found
 			expression = expression[:index] + "*" + expression[index:]
 		#We now check the balance of parentheses. This must be checked AFTER modifying the expression since we could double-count and get the wrong balance
-		if(expression[index]=="("): 
+		if(expression[index]=="("):
 			balance += 1
-		elif(expression[index]==")"): 
+		elif(expression[index]==")"):
 			balance -= 1 #Balance should be 0 if parentheses come in pairs
 		index += 1
 	if(balance != 0): 
@@ -41,7 +42,7 @@ def checkOperators(expList):
 	expression = expList[0]
 	#Operator at the end of the expression is always wrong
 	#Multiplication or division at the start of an expression is always wrong
-	if((expression[-1] in "*/+-") or (expression[0] in "*/")): return False 
+	if((expression[-1] in "*/+-") or (expression[0] in "*/")): return False
 	if(expression[0]=="+"): expression = expression[1:] #Remove unnecessary "+" at the start
 
 	for index in range(1, len(expression)):
@@ -50,14 +51,14 @@ def checkOperators(expList):
 			expression = expression[:index-1] + "-" + expression[index+1:]
 			index = 0 #Check the whole expression again
 		if((expression[index-1] in "*/") and (expression[index] in "*/")): return False #"*" and "/" right beside each other is invalid
-		if((((expression[index-1]=="-") and (expression[index]=="-")) or (index != 0 and (expression[index-1]=="+") and (expression[index]=="+")))): 
+		if((((expression[index-1]=="-") and (expression[index]=="-")) or (index != 0 and (expression[index-1]=="+") and (expression[index]=="+")))):
 			expression = expression[:index-1] + "+" + expression[index+1] #Turning a double negative or positive into a positive
 		if((expression[index-1] in "*/") and (expression[index]=="+")):
 			expression = expression[:index] + expression[index+1:] #Skips the unnecessary "+"
 			index = 0 #Check the whole expression again
 		if((expression[index-1] in "+-") and (expression[index] in "*/")): return False
 		#Operators and parenthesis
-		if(((expression[index-1]=="(") and (expression[index] in "*/")) or ((expression[index-1] in "*/+-") and (expression[index]==")"))): 
+		if(((expression[index-1]=="(") and (expression[index] in "*/")) or ((expression[index-1] in "*/+-") and (expression[index]==")"))):
 			return False 
 	expList[0] = expression
 	return True
@@ -90,11 +91,12 @@ def result(expression): #Finds the result of the expression on the display
 	#Then, find most inner parenthesis expressions and solve them
 	clearDisplay() #Clearing the display to later display whatever we want
 	if(valid):
-		display.insert(tk.END, findConAndSolve(expression))
+		display.insert(tk.END, findConAndSolve(expList))
 	else:
 		display.insert(tk.END, "Invalid input")
 
-def findConAndSolve(expression):
+def findConAndSolve(expList):
+	expression = expList[0]
 	print("Expression to solve: " + expression)
 	toReturn = expression
 	start = 0
@@ -129,6 +131,9 @@ def solve(content):
 	stop = 0
 	primeOPfound = False
 	OPindex = 0
+	contentArray = [content]
+	checkOperators(contentArray) #Just to clear up whenever +- or -+ pops up
+	content = contentArray[0]
 	print("	Content to solve: " + content)
 	for index in range(1, len(content)):
 		#Skips + and -, start is placed at the beginning of the first number to operate, if there even is a mul or div to do
