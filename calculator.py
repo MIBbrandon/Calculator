@@ -113,11 +113,15 @@ def checkDecimalPoint(expList):
     for char in expression:
         # If we come across an operator or parenthesis, a new number emerges, allowing it to have a decimal
         if (expression[index] in "*/+-()"):
-            DecimalAllowedAgain = True  # We will come across a new number, so a new decimal may exist
-        elif (DecimalAllowedAgain and expression[index] == "."):
-            DecimalAllowedAgain = False  # This blocks any new decimal until we come across an operator or parenthesis
-            if ((index != len(expression) - 1) and
-                    (not (expression[index - 1] in "0123456789" and expression[index + 1] in "0123456789"))):
+            DecimalAllowedAgain = True  # We will come across a new number, so a new decimal point may exist
+        elif(expression[index] == "."):
+            if(DecimalAllowedAgain):
+                DecimalAllowedAgain = False  # No new decimal point allowed until we reach an operator or symbol
+                # The following checks that the decimal point found has a number to each side
+                if ((index != len(expression) - 1) and
+                        (not (expression[index - 1] in "0123456789" and expression[index + 1] in "0123456789"))):
+                    return False
+            else:
                 return False
         index += 1
     return True
